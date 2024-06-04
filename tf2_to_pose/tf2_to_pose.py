@@ -30,6 +30,10 @@ class FrameListener(Node):
         use_stamped_parameter_descriptor = ParameterDescriptor(description='Use PoseStamped messages.')
         self.using_stamped = self.declare_parameter(
             'use_stamped', True, use_stamped_parameter_descriptor).get_parameter_value().bool_value
+        
+        pose_topic_parameter_descriptor = ParameterDescriptor(description='Topic where the pose will be published.')
+        self.pose_topic = self.declare_parameter(
+            'pose_topic', 'pose', pose_topic_parameter_descriptor).get_parameter_value().string_value
 
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
@@ -37,9 +41,9 @@ class FrameListener(Node):
 
         # Create pose publisher
         if self.using_stamped:
-            self.publisher = self.create_publisher(PoseStamped, 'measured_pose', 1)
+            self.publisher = self.create_publisher(PoseStamped, self.pose_topic, 1)
         else:
-            self.publisher = self.create_publisher(Pose, 'measured_pose', 1)
+            self.publisher = self.create_publisher(Pose, self.pose_topic, 1)
 
 
         # Call on_timer function every period
